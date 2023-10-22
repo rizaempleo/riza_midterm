@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Event Driven (Midterm Exam)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat:400,500&display=swap');
+        body {
+            font-family: Montserrat, Arial, Helvetica, sans-serif;
+            background-color: #f7f7f7;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        /* Add padding to container elements */
+        form {
+            padding: 20px;
+            width: 100%;
+            background: white;
+        }
+        /* Full-width input fields */
+        input[type=text], input[type=number], select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #f7f7f7;
+            font-family: Montserrat, Arial, Helvetica, sans-serif;
+        }
+        input[type=phone], select {
+            width: 100%;
+            padding: 15px;
+            margin: 5px 0 22px 0;
+            display: inline-block;
+            border: none;
+            background: #f7f7f7;
+        }
+        /* Set a style for all buttons */
+        button {
+            background-color: #0eb7f4;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.9;
+            font-size: 16px;
+            font-family: Montserrat, Arial, Helvetica, sans-serif;
+            border-radius: 10px;
+        }
+        button:hover {
+            opacity: 1;
+        }
+        .ptag {
+            color: red;
+        }
+        /* Change styles for signup button on extra small screens */
+        @media screen and (max-width: 300px) {
+            .signupbtn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="p-5">
+    <div class="row">
+        <div class="col-lg-4">
+            <form onsubmit="addProduct(); event.preventDefault()">
+                <h3>Product Management</h3>
+                <p>* - Required Fields</p>
+                <label for="prodid"><b>Product ID <span class='text-danger'>*</span></b></label>
+                <input type="text" readonly value="EVNT-DRV-1">
+                <label for="prodname"><b>Product Name <span class='text-danger'>*</span></b></label>
+                <input type="text" id="prodname">
+                <label for="prodcategory"><b>Category<span class='text-danger'>*</span></b></label>
+                <select id="prodcategory">
+                    <option>--Select Category--</option>
+                    <option>Food and Beverage</option>
+                    <option>Kitchen Appliances</option>
+                    <option>IT Equipment</option>
+                    <option>Shoes and Clothing</option>
+                </select>
+                <label for="sellprice"><b>Selling Price <span class='text-danger'>*</span></b></label>
+                <input type="number" id="sellprice">
+                <button class="bg-primary btn-sm" type="submit">Save</button>
+            </form>
+        </div>
+        <div class="col-lg-8">
+            <div class="row mb-4">
+                <!-- Your card stats code remains the same -->
+            </div>
+            <select class='bg-white' id='filterCategory' style='border: 1px solid #ddd !important;' onchange='filtercatChange()'>
+                <option>--Filter by Category--</option>
+                <option>See All</option>
+                <option>Food and Beverage</option>
+                <option>Kitchen Appliances</option>
+                <option>IT Equipment</option>
+                <option>Shoes and Clothing</option>
+            </select>
+            <table class="table table-responsive">
+                <thead class='text-center'>
+                    <tr>
+                        <th scope="col" class="bg-primary text-white">Product ID</th>
+                        <th scope="col" class="bg-primary text-white">Name</th>
+                        <th scope="col" class="bg-primary text-white">Category</th>
+                        <th scope="col" class="bg-primary text-white">Selling Price</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyproducts" class='text-center'>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        var products = [];
+        var next_prod_id = 1;
+
+        function addProduct() {
+            var prod_id = "EVNT-DRIV-MID-" + next_prod_id;
+            var prod_name = document.getElementById("prodname").value;
+            var prod_category = document.getElementById("prodcategory").value;
+            var sell_price = '₱&nbsp' + document.getElementById("sellprice").value;
+
+            var product = {
+                id: prod_id,
+                name: prod_name,
+                category: prod_category,
+                price: sell_price
+            };
+
+            products.push(product);
+            next_prod_id++;
+
+            document.getElementById("prodname").value = "";
+            document.getElementById("prodcategory").selectedIndex = 0;
+            document.getElementById("sellprice").value = "";
+            document.getElementById("prodname").focus();
+
+            displayProducts();
+            updateCategoryCounts();
+        }
+
+        function displayProducts() {
+            var tbody = document.getElementById("tbodyproducts");
+            tbody.innerHTML = "";
+            for (var i = 0; i < products.length; i++) {
+                var tr = "<tr><td>" + products[i].id + "</td><td>" + products[i].name + "</td><td>" + products[i].category + "</td><td>" + products[i].price + "</td></tr>";
+                tbody.innerHTML += tr;
+            }
+        }
+
+        function updateCategoryCounts() {
+            var FoodandBeverageCount = 0;
+            var KitchenAppliancesCount = 0;
+            var ITEquipmentCount = 0;
+            var ShoesandClothingCount = 0;
+            for (var i = 0; i < products.length; i++) {
+                if (products[i].category == "Food and Beverage") {
+                    FoodandBeverageCount++;
+                } else if (products[i].category == "Kitchen Appliances") {
+                    KitchenAppliancesCount++;
+                } else if (products[i].category == "IT Equipment") {
+                    ITEquipmentCount++;
+                } else if (products[i].category == "Shoes and Clothing") {
+                    ShoesandClothingCount++;
+                }
+            }
+            document.getElementById("filterCategory").selectedIndex = 0;
+            document.getElementById("filterCategory").value = "--Filter by Category--";
+            document.querySelector("#filterCategory").options[0].disabled = true;
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+</html>
